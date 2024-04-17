@@ -149,6 +149,33 @@ describe('TESTES DA ROTA /AUTH', function () {
     })
 
 
+  it('ERRO AO LOGAR COM MESMO E-MAIL JÁ CADASTRADO', function () {
+
+    var senha = '1234567';
+    cy.request('POST', (baseUrl + '/api/users'), {
+        name: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: senha,
+      }).then(function(resposta) {
+        name = resposta.body.name;
+        email = resposta.body.email;
+        cy.log(resposta);
+        cy.request({
+          method: 'POST',
+          url: (baseUrl + '/api/auth/login'),
+          body: {
+            email: resposta.body.name,
+            password: senha,
+          },
+          failOnStatusCode: false,
+        }).then(function(retorno) {
+          cy.log(retorno);
+          expect(retorno.status).to.equal(400);
+        })   
+      })
+    })
+
+
 
 
   
@@ -158,6 +185,40 @@ describe('TESTES DA ROTA /AUTH', function () {
 describe('TESTES DA ROTA /FILMES', function () {
 
   const baseUrl = 'https://raromdb-3c39614e42d4.herokuapp.com';
+
+
+  it('DEVE REALIZAR A ENTRADA DE USER NO FILME COM SUCESSO', function () {
+    var name;
+    var email;
+    var senha = '1234567';
+    var token = "Bearer";
+
+    cy.request('POST', (baseUrl + '/api/users'), {
+        name: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: senha,
+      }).then(function(resposta) {
+        name = resposta.body.name;
+        email = resposta.body.email;
+        cy.log(resposta);
+        cy.request('POST', (baseUrl + '/api/auth/login') ,{
+          email: email,
+          password: senha,
+        }).then(function(resposta) {
+          token = token + resposta.body.accessToken          
+        })
+            
+        cy.request({
+          method: 'PATCH',
+          url: baseUrl + '/api/users/admin',
+          headers: {
+            Authorization: token + resposta.body.accessToken
+          },
+          failOnStatusCode: false
+        });
+      });
+
+  });
 
   it('FALHA AO CRIAR FILME POR FALTA DE TITULO', function () {
     cy.request({
