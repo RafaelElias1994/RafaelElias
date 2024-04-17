@@ -2,6 +2,17 @@ import { faker } from '@faker-js/faker';
 
 describe('TESTES DA ROTA /USERS', function () {
 
+  afterEach(function() {
+    cy.request({
+      method: 'DELETE',
+      url: (baseUrl + '/api/users/{id}'),
+      body: {
+        id: id,
+      },
+      failOnStatusCode: false,
+    });
+  })
+
   var name;
   var email;
   var id;
@@ -62,6 +73,25 @@ describe('TESTES DA ROTA /USERS', function () {
         expect(resposta.body.name).to.equal(name);
         expect(resposta.body.email).to.equal(email);
 
+
+      });
+
+  it('O USUÁRIO É CADASTRADO COM SUCESSO!', function() {
+    cy.request('POST', (baseUrl + '/api/users'), {
+      name: faker.internet.userName(),
+      email: faker.internet.email(),
+      password: 'Rafa1234@'
+      }).then(function(resposta) {
+        name = resposta.body.name;
+        email = resposta.body.email;
+        id = resposta.body.id;
+
+        cy.log(resposta);
+        expect(resposta.status).to.equal(201);
+        expect(resposta.body.name).to.equal(name);
+        expect(resposta.body.email).to.equal(email);
+
+        
         cy.request({
           method: 'DELETE',
           url: (baseUrl + '/api/users/{id}'),
@@ -71,10 +101,14 @@ describe('TESTES DA ROTA /USERS', function () {
           failOnStatusCode: false,
         });
       });
+
+    });
   });
 });
 
 describe('TESTES DA ROTA /AUTH', function () {
+
+  
 
   var senha = '1234567';
   var token = "Bearer";
