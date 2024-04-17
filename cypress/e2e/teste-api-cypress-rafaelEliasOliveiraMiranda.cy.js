@@ -2,6 +2,10 @@ import { faker } from '@faker-js/faker';
 
 describe('TESTES DA ROTA /USERS', function () {
 
+  beforeEach(function (){
+    cy.log('O hook executou');
+  });
+
   afterEach(function() {
     cy.request({
       method: 'DELETE',
@@ -12,6 +16,8 @@ describe('TESTES DA ROTA /USERS', function () {
       failOnStatusCode: false,
     });
   })
+
+  
 
   var name;
   var email;
